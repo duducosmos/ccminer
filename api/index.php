@@ -273,7 +273,7 @@ span.elipsis { display: inline-block; max-width: 130px; overflow: hidden; }
 </div>
 
 <div id="footer">
-<p>&copy; 2014-2015 <a href="http://github.com/tpruvot/ccminer">tpruvot@github</a></p>
+<p>&copy; 2017-2018 <a href="http://github.com/gelotus/ccminer">gelotus</a></p>
 </div>
 
 </body>
