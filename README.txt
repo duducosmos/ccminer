@@ -6,19 +6,8 @@ ccminer 2.2.3 (Dec. 2017)    "polytimos algo and keccakc (opt)"
 If you find this tool useful and like to support its continuous
           development, then consider a donation.
 
-tpruvot@github:
-  BTC  : 1AJdfCpLWPNoAMDfHF1wD5y8VgKSSTHxPo
-  DCR  : DsUCcACGcyP8McNMRXQwbtpDxaVUYLDQDeU
-
-DJM34:
-  BTC donation address: 1NENYmxwZGHsKFmyjTc5WferTn5VTFb7Ze
-  
 gelotus:
   BTC  : 1a2gWsePbgC7DNCN6yNFWqHAPotvpyXLN
-
-cbuchner v1.2:
-  LTC donation address: LKS1WDKGED647msBQfLBHV3Ls8sveGncnm
-  BTC donation address: 16hJF5mceSojnTD3ZTUDqdRhDyPJzoRakM
 
 ***************************************************************
 
