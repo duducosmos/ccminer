@@ -15,27 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="compat/pthreads/autostatic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compat/pthreads/cleanup.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compat/pthreads/create.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compat/pthreads/dll.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compat/pthreads/errno.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compat/pthreads/global.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compat/pthreads/pthread.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="compat/pthreads/pthread_attr_destroy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -439,6 +418,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="compat/pthreads/sched_setaffinity.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\pthreads\cleanup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\pthreads\create.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\pthreads\errno.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compat\pthreads\global.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,8 +4,6 @@
 
 #include <stdio.h>
 
-#include "uint256.h"
-
 #include <openssl/opensslv.h>
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #include "compat/bignum_ssl10.hpp"
