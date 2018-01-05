@@ -1,10 +1,11 @@
-# ccminer
+# ccminer-VC2015
+Heavy optimized for Windows, build from Visual Studio 2015, CUDA 9.1.
 
-Based on Christian Buchner's &amp; Christian H.'s CUDA project, no more active on github since 2014.
+Based on tpruvot fork of ccminer
 
 Check the [README.txt](README.txt) for the additions
 
-BTC donation address: 1AJdfCpLWPNoAMDfHF1wD5y8VgKSSTHxPo (tpruvot)
+
 
 BTC donation address: 1a2gWsePbgC7DNCN6yNFWqHAPotvpyXLN  (gelotus)
 
@@ -36,6 +37,17 @@ Tested for 5 mins on a stock clocked Palit GeForce 750Ti against X11 algo:
 
 VC2015 CUDA 9.1 OpenSSL 1.1.0 -> 2862.65 kH/s
 VC2013 binary release         -> 2847.10 kH/s
+
+# Obtain sources
+Install git for windows
+
+Open a command prompt shell
+
+    $ git clone https://github.com/gelotus/ccminer
+	$ cd ccminer
+    $ git submodule update --init --recursive
+      
+
 
 # Building
 

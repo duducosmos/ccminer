@@ -590,9 +590,5 @@ Source code is included to satisfy GNU GPL V3 requirements.
 
 
 With kind regards,
-
-   Christian Buchner ( Christian.Buchner@gmail.com )
-   Christian H. ( Chris84 )
-   Tanguy Pruvot ( tpruvot@github )
    gelotus
    

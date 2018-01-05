@@ -203,7 +203,7 @@
       <PerformDeviceLink>false</PerformDeviceLink>
     </CudaLink>
     <PostBuildEvent>
-      <Command>7z\7za.exe a dist\ccminer-$(PlatformShortName).7z api\ .\$(Configuration)\$(PlatformShortName)\$(AssemblyName)-$(PlatformShortName).exe ccminer.conf README.txt RUN-CREA.cmd "$(VCInstallDir)redist\$(PlatformShortName)\Microsoft.VC140.CRT\msvcp140.dll"
+      <Command>7z\7za.exe a dist\ccminer-$(PlatformShortName).7z api\ .\$(Configuration)\$(PlatformShortName)\$(AssemblyName)-$(PlatformShortName).exe ccminer.conf README.txt "$(VCInstallDir)redist\$(PlatformShortName)\Microsoft.VC140.CRT\msvcp140.dll"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -258,7 +258,7 @@
       <GPUDebugInfo>false</GPUDebugInfo>
     </CudaLink>
     <PostBuildEvent>
-      <Command>7z\7za.exe a dist\ccminer-$(PlatformShortName).7z api\ .\$(Configuration)\$(PlatformShortName)\$(AssemblyName)-$(PlatformShortName).exe ccminer.conf README.txt RUN-CREA.cmd "$(VCInstallDir)redist\$(PlatformShortName)\Microsoft.VC140.CRT\msvcp140.dll"</Command>
+      <Command>7z\7za.exe a dist\ccminer-$(PlatformShortName).7z api\ .\$(Configuration)\$(PlatformShortName)\$(AssemblyName)-$(PlatformShortName).exe ccminer.conf README.txt "$(VCInstallDir)redist\$(PlatformShortName)\Microsoft.VC140.CRT\msvcp140.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
