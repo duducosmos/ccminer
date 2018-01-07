@@ -1,5 +1,5 @@
 
-ccminer 2.2.4 (Jan. 2018)     "lyra2v2 and keccak improvements"
+ccminer 2.2.4.1 (Jan. 2018)     "build with NVAPI r384"
 ---------------------------------------------------------------
 
 ***************************************************************
@@ -230,10 +230,10 @@ Example for Groestlcoin solo mining
     ccminer -q -s 1 -a groestl -o http://127.0.0.1:1441/ -u USERNAME -p PASSWORD
 
 Example for Boolberry
-    ccminer -a wildkeccak -o stratum+tcp://bbr.suprnova.cc:7777 -u tpruvot.donate -p x -k http://bbr.suprnova.cc/scratchpad.bin -l 64x360
+    ccminer -a wildkeccak -o stratum+tcp://bbr.suprnova.cc:7777 -u USERNAME -p x -k http://bbr.suprnova.cc/scratchpad.bin -l 64x360
 
 Example for Scrypt-N (2048) on Nicehash
-    ccminer -a scrypt:10 -o stratum+tcp://stratum.nicehash.com:3335 -u 3EujYFcoBzWvpUEvbe3obEG95mBuU88QBD -p x
+    ccminer -a scrypt:10 -o stratum+tcp://stratum.nicehash.com:3335 -u USERNAME -p x
 
 For solo-mining you typically use -o http://127.0.0.1:xxxx where xxxx represents
 the rpcport number specified in your wallet's .conf file and you have to pass the same username
@@ -269,6 +269,10 @@ so we can more efficiently implement new algorithms using the latest hardware
 features.
 
 >>> RELEASE HISTORY <<<
+  Jan. 07th 2018  v2.2.4.1
+                  fix warning during compiling CUDA files
+				  Update CUDA SDK to v9.1.85
+				  Update NVAPI to r384.0
   Jan. 04th 2017  v2.2.4
                   Improve lyra2v2
                   Higher keccak default intensity
