@@ -103,7 +103,7 @@
       <MaxRegCount>80</MaxRegCount>
       <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_62,sm_62;compute_61,sm_61;compute_60,sm_60;compute_52,sm_52;compute_50,sm_50</CodeGeneration>
       <Include>$(NVTOOLSEXT_PATH)\include;..\..\..\Common\C99</Include>
       <KeepDir>$(IntDir)</KeepDir>
     </CudaCompile>
@@ -142,7 +142,7 @@
       <MaxRegCount>80</MaxRegCount>
       <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
-      <CodeGeneration>compute_52,sm_52</CodeGeneration>
+      <CodeGeneration>compute_62,sm_62;compute_61,sm_61;compute_60,sm_60;compute_52,sm_52;compute_50,sm_50</CodeGeneration>
       <Include>$(NVTOOLSEXT_PATH)\include;..\..\..\Common\C99</Include>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <KeepDir>$(IntDir)</KeepDir>
@@ -190,7 +190,7 @@
       <MaxRegCount>80</MaxRegCount>
       <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
-      <CodeGeneration>compute_50,sm_50;compute_52,sm_52</CodeGeneration>
+      <CodeGeneration>compute_62,sm_62;compute_61,sm_61;compute_60,sm_60;compute_52,sm_52;compute_50,sm_50</CodeGeneration>
       <AdditionalOptions>--ptxas-options="-O2" --Wno-deprecated-gpu-targets %(AdditionalOptions)</AdditionalOptions>
       <Optimization>O3</Optimization>
       <KeepDir>$(IntDir)</KeepDir>
@@ -244,7 +244,7 @@
       <MaxRegCount>80</MaxRegCount>
       <PtxAsOptionV>true</PtxAsOptionV>
       <Keep>true</Keep>
-      <CodeGeneration>compute_52,sm_52;compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_62,sm_62;compute_61,sm_61;compute_60,sm_60;compute_52,sm_52;compute_50,sm_50</CodeGeneration>
       <Include>$(NVTOOLSEXT_PATH)\include</Include>
       <Optimization>O3</Optimization>
       <TargetMachinePlatform>64</TargetMachinePlatform>
@@ -346,10 +346,16 @@
       <MaxRegCount>128</MaxRegCount>
     </CudaCompile>
     <CudaCompile Include="equi\cuda_equi.cu">
-      <CodeGeneration>compute_52,sm_52;compute_50,sm_50</CodeGeneration>
       <AdditionalOptions> -Xptxas -dlcm=ca -Xptxas -dscm=cs %(AdditionalOptions)</AdditionalOptions>
       <MaxRegCount>0</MaxRegCount>
-      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Release|x64'">compute_61,sm_61;compute_52,sm_52;compute_50,sm_50</CodeGeneration>
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </CodeGeneration>
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </CodeGeneration>
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </CodeGeneration>
+      <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </CodeGeneration>
     </CudaCompile>
     <CudaCompile Include="neoscrypt\cuda_neoscrypt.cu">
       <MaxRegCount>160</MaxRegCount>
@@ -463,46 +469,38 @@
     <CudaCompile Include="scrypt\keccak.cu" />
     <CudaCompile Include="scrypt\sha256.cu" />
     <CudaCompile Include="scrypt\salsa_kernel.cu">
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
     <CudaCompile Include="scrypt\fermi_kernel.cu">
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
     <CudaCompile Include="scrypt\kepler_kernel.cu">
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
     <CudaCompile Include="scrypt\nv_kernel.cu">
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
-    <CudaCompile Include="scrypt\nv_kernel2.cu">
-      <CodeGeneration>compute_50,sm_50;compute_52,sm_52</CodeGeneration>
-    </CudaCompile>
+    <CudaCompile Include="scrypt\nv_kernel2.cu" />
     <CudaCompile Include="scrypt\test_kernel.cu">
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
     </CudaCompile>
     <CudaCompile Include="scrypt\titan_kernel.cu">
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_35,sm_35</CodeGeneration>
     </CudaCompile>
     <CudaCompile Include="sha256\cuda_sha256d.cu" />
     <CudaCompile Include="sha256\sha256d.cu" />
     <CudaCompile Include="sha256\cuda_sha256t.cu" />
     <CudaCompile Include="sha256\sha256t.cu" />
     <CudaCompile Include="zr5.cu" />
-    <CudaCompile Include="heavy\cuda_blake512.cu">
-    </CudaCompile>
-    <CudaCompile Include="heavy\cuda_combine.cu">
-    </CudaCompile>
-    <CudaCompile Include="heavy\cuda_groestl512.cu">
-    </CudaCompile>
+    <CudaCompile Include="heavy\cuda_blake512.cu" />
+    <CudaCompile Include="heavy\cuda_combine.cu" />
+    <CudaCompile Include="heavy\cuda_groestl512.cu" />
     <CudaCompile Include="heavy\cuda_hefty1.cu">
       <MaxRegCount>80</MaxRegCount>
     </CudaCompile>
-    <CudaCompile Include="heavy\cuda_keccak512.cu">
-    </CudaCompile>
-    <CudaCompile Include="heavy\cuda_sha256.cu">
-    </CudaCompile>
-    <CudaCompile Include="heavy\heavy.cu">
-    </CudaCompile>
+    <CudaCompile Include="heavy\cuda_keccak512.cu" />
+    <CudaCompile Include="heavy\cuda_sha256.cu" />
+    <CudaCompile Include="heavy\heavy.cu" />
     <CudaCompile Include="heavy\bastion.cu" />
     <CudaCompile Include="heavy\cuda_bastion.cu" />
     <CudaCompile Include="JHA\jha.cu" />
@@ -510,8 +508,7 @@
     <CudaCompile Include="JHA\cuda_jha_compactionTest.cu">
       <AdditionalOptions>-Xptxas "-abi=yes" %(AdditionalOptions)</AdditionalOptions>
     </CudaCompile>
-    <CudaCompile Include="JHA\cuda_jha_keccak512.cu">
-    </CudaCompile>
+    <CudaCompile Include="JHA\cuda_jha_keccak512.cu" />
     <CudaCompile Include="Algo256\blake256.cu">
       <MaxRegCount>64</MaxRegCount>
       <AdditionalOptions Condition="'$(Configuration)'=='Release'">--ptxas-options="-dlcm=cg" %(AdditionalOptions)</AdditionalOptions>
@@ -558,13 +555,11 @@
       <AdditionalOptions Condition="'$(Configuration)'=='Release'">-Xptxas "-abi=yes" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)'=='Debug'">-Xptxas "-abi=yes" %(AdditionalOptions)</AdditionalOptions>
     </CudaCompile>
-    <CudaCompile Include="quark\cuda_quark_groestl512.cu">
-    </CudaCompile>
+    <CudaCompile Include="quark\cuda_quark_groestl512.cu" />
     <CudaCompile Include="quark\cuda_quark_keccak512.cu">
       <MaxRegCount>88</MaxRegCount>
     </CudaCompile>
-    <CudaCompile Include="quark\cuda_skein512.cu">
-    </CudaCompile>
+    <CudaCompile Include="quark\cuda_skein512.cu" />
     <CudaCompile Include="quark\quarkcoin.cu" />
     <CudaCompile Include="quark\nist5.cu" />
     <CudaCompile Include="qubit\deep.cu" />
@@ -590,19 +585,15 @@
     </CudaCompile>
     <CudaCompile Include="skunk\skunk.cu" />
     <CudaCompile Include="skunk\cuda_skunk.cu">
-      <CodeGeneration>compute_50,sm_50;compute_52,sm_52</CodeGeneration>
       <MaxRegCount>64</MaxRegCount>
     </CudaCompile>
     <CudaCompile Include="skunk\cuda_skunk_streebog.cu" />
     <ClInclude Include="tribus\cuda_echo512_aes.cuh" />
-    <CudaCompile Include="tribus\cuda_echo512_final.cu">
-      <CodeGeneration>compute_50,sm_50;compute_52,sm_52</CodeGeneration>
-    </CudaCompile>
+    <CudaCompile Include="tribus\cuda_echo512_final.cu" />
     <CudaCompile Include="tribus\tribus.cu" />
     <ClInclude Include="x11\cuda_x11_aes.cuh" />
     <CudaCompile Include="x11\cuda_x11_cubehash512.cu" />
-    <CudaCompile Include="x11\cuda_x11_echo.cu">
-    </CudaCompile>
+    <CudaCompile Include="x11\cuda_x11_echo.cu" />
     <CudaCompile Include="x11\cuda_x11_luffa512.cu" />
     <CudaCompile Include="x11\cuda_x11_luffa512_Cubehash.cu">
       <MaxRegCount>76</MaxRegCount>
@@ -629,8 +620,7 @@
     <CudaCompile Include="x13\cuda_x13_hamsi512.cu">
       <MaxRegCount>72</MaxRegCount>
     </CudaCompile>
-    <CudaCompile Include="x13\cuda_x13_fugue512.cu">
-    </CudaCompile>
+    <CudaCompile Include="x13\cuda_x13_fugue512.cu" />
     <CudaCompile Include="x13\x13.cu" />
     <CudaCompile Include="x13\cuda_hsr_sm3.cu" />
     <CudaCompile Include="x13\hsr.cu" />
@@ -640,10 +630,8 @@
     <CudaCompile Include="x17\hmq17.cu" />
     <CudaCompile Include="x15\x15.cu" />
     <CudaCompile Include="x15\whirlpool.cu" />
-    <CudaCompile Include="x17\x17.cu">
-    </CudaCompile>
-    <CudaCompile Include="x17\cuda_x17_haval256.cu">
-    </CudaCompile>
+    <CudaCompile Include="x17\x17.cu" />
+    <CudaCompile Include="x17\cuda_x17_haval256.cu" />
     <CudaCompile Include="x17\cuda_x17_sha512.cu">
       <MaxRegCount>80</MaxRegCount>
     </CudaCompile>
