@@ -65,7 +65,8 @@
 #define __CUDA_ARCH__ 520
 uint32_t __byte_perm(uint32_t x, uint32_t y, uint32_t z);
 uint32_t __byte_perm(uint32_t x, uint32_t y, uint32_t z);
-uint32_t __shfl(uint32_t x, uint32_t y, uint32_t z);
+uint32_t __shfl2(uint32_t x, uint32_t y);
+uint32_t __shfl_sync(uint32_t mask, uint32_t x, uint32_t y);
 uint32_t atomicExch(uint32_t *x, uint32_t y);
 uint32_t atomicAdd(uint32_t *x, uint32_t y);
 void __syncthreads(void);
@@ -79,11 +80,12 @@ u32 umin(const u32, const u32);
 u32 umax(const u32, const u32);
 #endif
 
-#if CUDA_VERSION >= 9000
-#undef __shfl
+#if CUDA_VERSION >= 9000 && __CUDA_ARCH__ >= 300
+#define __shfl2(var, srcLane)  __shfl_sync(0xFFFFFFFFu, var, srcLane)
 #undef __any
-#define __shfl(a, b) __shfl_sync(0xFFFFFFFF, a, b)
-#define __any(a) __any_sync(0xFFFFFFFF, a)
+#define __any(p) __any_sync(0xFFFFFFFFu, p)
+#else
+#define __shfl2 __shfl
 #endif
 
 typedef u32 proof[PROOFSIZE];
@@ -1851,7 +1853,7 @@ __global__ void digit_last_wdc(equi<RB, SM>* eq)
 		}
 #if __CUDA_ARCH__ >= 300
 		// all threads get the value from lane 0
-		soli = __shfl(soli, 0);
+		soli = __shfl2(soli, 0);
 #else
 		__syncthreads();
 		soli = eq->edata.srealcont.nsols;
