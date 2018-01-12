@@ -1105,8 +1105,8 @@ static void api()
 	unsigned short port = (unsigned short) opt_api_port; // 4068
 	char buf[MYBUFSIZ];
 	int n, bound;
-	char *connectaddr;
-	char *binderror;
+	char *connectaddr = nullptr;
+	char *binderror = nullptr;
 	char group;
 	time_t bindstart;
 	struct sockaddr_in serv;
