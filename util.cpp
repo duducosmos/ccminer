@@ -1487,8 +1487,8 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	ntime = swab32(ntime) - (uint32_t) time(0);
 	if (ntime > sctx->srvtime_diff) {
 		sctx->srvtime_diff = ntime;
+			applog(LOG_DEBUG, "stratum time is at least %d seconds in the future", ntime);
 		if (opt_protocol && ntime > 20)
-			applog(LOG_DEBUG, "stratum time is at least %ds in the future", ntime);
 	}
 
 	if (merkle_count)
