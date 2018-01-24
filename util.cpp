@@ -1,13 +1,13 @@
 /*
- * Copyright 2010 Jeff Garzik
- * Copyright 2012-2014 pooler
- * Copyright 2014 ccminer team
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
- * any later version.  See COPYING for more details.
- */
+* Copyright 2010 Jeff Garzik
+* Copyright 2012-2014 pooler
+* Copyright 2014 ccminer team
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the Free
+* Software Foundation; either version 2 of the License, or (at your option)
+* any later version.  See COPYING for more details.
+*/
 
 //#define _GNU_SOURCE
 #include <ccminer-config.h>
@@ -90,14 +90,14 @@ void applog(int prio, const char *fmt, ...)
 		/* custom colors to syslog prio */
 		if (prio > LOG_DEBUG) {
 			switch (prio) {
-				case LOG_BLUE: prio = LOG_NOTICE; break;
+			case LOG_BLUE: prio = LOG_NOTICE; break;
 			}
 		}
 
 		va_copy(ap2, ap);
 		len = vsnprintf(NULL, 0, fmt, ap2) + 1;
 		va_end(ap2);
-		buf = (char*) alloca(len);
+		buf = (char*)alloca(len);
 		if (vsnprintf(buf, len, fmt, ap) >= 0)
 			syslog(prio, "%s", buf);
 	}
@@ -114,22 +114,22 @@ void applog(int prio, const char *fmt, ...)
 		localtime_r(&now, &tm);
 
 		switch (prio) {
-			case LOG_ERR:     color = CL_RED; break;
-			case LOG_WARNING: color = CL_YLW; break;
-			case LOG_NOTICE:  color = CL_WHT; break;
-			case LOG_INFO:    color = ""; break;
-			case LOG_DEBUG:   color = CL_GRY; break;
+		case LOG_ERR:     color = CL_RED; break;
+		case LOG_WARNING: color = CL_YLW; break;
+		case LOG_NOTICE:  color = CL_WHT; break;
+		case LOG_INFO:    color = ""; break;
+		case LOG_DEBUG:   color = CL_GRY; break;
 
-			case LOG_BLUE:
-				prio = LOG_NOTICE;
-				color = CL_CYN;
-				break;
+		case LOG_BLUE:
+			prio = LOG_NOTICE;
+			color = CL_CYN;
+			break;
 		}
 		if (!use_colors)
 			color = "";
 
-		len = 40 + (int) strlen(fmt) + 2;
-		f = (char*) alloca(len);
+		len = 40 + (int)strlen(fmt) + 2;
+		f = (char*)alloca(len);
 		sprintf(f, "[%d-%02d-%02d %02d:%02d:%02d]%s %s%s\n",
 			tm.tm_year + 1900,
 			tm.tm_mon + 1,
@@ -170,14 +170,15 @@ void gpulog(int prio, int thr_id, const char *fmt, ...)
 		len = snprintf(pfmt, 128, "GPU T%d: %s", thr_id, fmt);
 	else
 		len = snprintf(pfmt, 128, "GPU #%d: %s", dev_id, fmt);
-	pfmt[sizeof(pfmt)-1]='\0';
+	pfmt[sizeof(pfmt) - 1] = '\0';
 
 	va_start(ap, fmt);
 
 	if (len && vsnprintf(line, sizeof(line), pfmt, ap)) {
-		line[sizeof(line)-1]='\0';
+		line[sizeof(line) - 1] = '\0';
 		applog(prio, "%s", line);
-	} else {
+	}
+	else {
 		fprintf(stderr, "%s OOM!\n", __func__);
 	}
 
@@ -249,7 +250,7 @@ static void databuf_free(struct data_buffer *db)
 }
 
 static size_t all_data_cb(const void *ptr, size_t size, size_t nmemb,
-			  void *user_data)
+	void *user_data)
 {
 	struct data_buffer *db = (struct data_buffer *)user_data;
 	size_t len = size * nmemb;
@@ -273,7 +274,7 @@ static size_t all_data_cb(const void *ptr, size_t size, size_t nmemb,
 }
 
 static size_t upload_data_cb(void *ptr, size_t size, size_t nmemb,
-			     void *user_data)
+	void *user_data)
 {
 	struct upload_buffer *ub = (struct upload_buffer *)user_data;
 	unsigned int len = (unsigned int)(size * nmemb);
@@ -293,7 +294,7 @@ static size_t upload_data_cb(void *ptr, size_t size, size_t nmemb,
 static int seek_data_cb(void *user_data, curl_off_t offset, int origin)
 {
 	struct upload_buffer *ub = (struct upload_buffer *)user_data;
-	
+
 	switch (origin) {
 	case SEEK_SET:
 		ub->pos = (size_t)offset;
@@ -355,7 +356,7 @@ static size_t resp_hdr_cb(void *ptr, size_t size, size_t nmemb, void *user_data)
 
 	if (!strcasecmp("X-Reject-Reason", key)) {
 		hi->reason = val;	/* X-Mining-Extensions: reject-reason */
-		//applog(LOG_WARNING, "%s:%s", key, val);
+							//applog(LOG_WARNING, "%s:%s", key, val);
 		val = NULL;
 	}
 
@@ -409,7 +410,7 @@ static int sockopt_keepalive_cb(void *userdata, curl_socket_t fd,
 	struct tcp_keepalive vals;
 	vals.onoff = 1;
 	vals.keepalivetime = tcp_keepidle * 1000;
-	vals.keepaliveinterval = tcp_keepintvl * 1000;	
+	vals.keepaliveinterval = tcp_keepintvl * 1000;
 	if (unlikely(WSAIoctl(fd, SIO_KEEPALIVE_VALS, &vals, sizeof(vals),
 		NULL, 0, &outputBytes, NULL, NULL)))
 		return 1;
@@ -420,11 +421,11 @@ static int sockopt_keepalive_cb(void *userdata, curl_socket_t fd,
 #endif
 
 /* For getwork (longpoll or wallet) - not stratum pools!
- * DO NOT USE DIRECTLY
- */
+* DO NOT USE DIRECTLY
+*/
 static json_t *json_rpc_call(CURL *curl, const char *url,
-		      const char *userpass, const char *rpc_req,
-		      bool longpoll_scan, bool longpoll, bool keepalive, int *curl_err)
+	const char *userpass, const char *rpc_req,
+	bool longpoll_scan, bool longpoll, bool keepalive, int *curl_err)
 {
 	json_t *val, *err_val, *res_val;
 	int rc;
@@ -435,7 +436,7 @@ static json_t *json_rpc_call(CURL *curl, const char *url,
 	char *httpdata;
 	char len_hdr[64], hashrate_hdr[64];
 	char curl_err_str[CURL_ERROR_SIZE] = { 0 };
-	long timeout = longpoll ? opt_timeout : opt_timeout/2;
+	long timeout = longpoll ? opt_timeout : opt_timeout / 2;
 	struct header_info hi = { 0 };
 	bool lp_scanning = longpoll_scan && !have_longpoll;
 
@@ -486,7 +487,7 @@ static json_t *json_rpc_call(CURL *curl, const char *url,
 	upload_data.buf = rpc_req;
 	upload_data.len = strlen(rpc_req);
 	upload_data.pos = 0;
-	sprintf(len_hdr, "Content-Length: %lu", (unsigned long) upload_data.len);
+	sprintf(len_hdr, "Content-Length: %lu", (unsigned long)upload_data.len);
 	sprintf(hashrate_hdr, "X-Mining-Hashrate: %llu", (unsigned long long) global_hashrate);
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -511,8 +512,8 @@ static json_t *json_rpc_call(CURL *curl, const char *url,
 
 	/* If X-Stratum was found, activate Stratum */
 	if (want_stratum && hi.stratum_url &&
-	    !strncasecmp(hi.stratum_url, "stratum+tcp://", 14) &&
-	    !(opt_proxy && opt_proxy_type == CURLPROXY_HTTP)) {
+		!strncasecmp(hi.stratum_url, "stratum+tcp://", 14) &&
+		!(opt_proxy && opt_proxy_type == CURLPROXY_HTTP)) {
 		have_stratum = true;
 		tq_push(thr_info[stratum_thr_id].q, hi.stratum_url);
 		hi.stratum_url = NULL;
@@ -531,7 +532,7 @@ static json_t *json_rpc_call(CURL *curl, const char *url,
 		goto err_out;
 	}
 
-	httpdata = (char*) all_data.buf;
+	httpdata = (char*)all_data.buf;
 
 	if (*httpdata != '{' && *httpdata != '[') {
 		long errcode = 0;
@@ -557,12 +558,12 @@ static json_t *json_rpc_call(CURL *curl, const char *url,
 	}
 
 	/* JSON-RPC valid response returns a non-null 'result',
-	 * and a null 'error'. */
+	* and a null 'error'. */
 	res_val = json_object_get(val, "result");
 	err_val = json_object_get(val, "error");
 
 	if (!res_val || json_is_null(res_val) ||
-	    (err_val && !json_is_null(err_val))) {
+		(err_val && !json_is_null(err_val))) {
 		char *s = NULL;
 
 		if (err_val) {
@@ -570,7 +571,7 @@ static json_t *json_rpc_call(CURL *curl, const char *url,
 			json_t *msg = json_object_get(err_val, "message");
 			json_t *err_code = json_object_get(err_val, "code");
 			if (curl_err && json_integer_value(err_code))
-				*curl_err = (int) json_integer_value(err_code);
+				*curl_err = (int)json_integer_value(err_code);
 
 			if (json_is_string(msg)) {
 				free(s);
@@ -619,7 +620,7 @@ json_t *json_rpc_call_pool(CURL *curl, struct pool_infos *pool, const char *req,
 	char userpass[512];
 	// todo, malloc and store that in pool array
 	snprintf(userpass, sizeof(userpass), "%s%c%s", pool->user,
-		strlen(pool->pass)?':':'\0', pool->pass);
+		strlen(pool->pass) ? ':' : '\0', pool->pass);
 
 	return json_rpc_call(curl, pool->url, userpass, req, longpoll_scan, false, false, curl_err);
 }
@@ -629,7 +630,7 @@ json_t *json_rpc_longpoll(CURL *curl, char *lp_url, struct pool_infos *pool, con
 {
 	char userpass[512];
 	snprintf(userpass, sizeof(userpass), "%s%c%s", pool->user,
-		strlen(pool->pass)?':':'\0', pool->pass);
+		strlen(pool->pass) ? ':' : '\0', pool->pass);
 
 	// on pool rotate by time-limit, this keepalive can be a problem
 	bool keepalive = pool->time_limit == 0 || pool->time_limit > opt_timeout;
@@ -658,7 +659,8 @@ json_t *json_load_url(char* cfg_url, json_error_t *err)
 	if (opt_proxy) {
 		curl_easy_setopt(curl, CURLOPT_PROXY, opt_proxy);
 		curl_easy_setopt(curl, CURLOPT_PROXYTYPE, opt_proxy_type);
-	} else if (getenv("http_proxy")) {
+	}
+	else if (getenv("http_proxy")) {
 		if (getenv("all_proxy"))
 			curl_easy_setopt(curl, CURLOPT_PROXY, getenv("all_proxy"));
 		else if (getenv("ALL_PROXY"))
@@ -683,8 +685,8 @@ err_out:
 }
 
 /**
- * Unlike malloc, calloc set the memory to zero
- */
+* Unlike malloc, calloc set the memory to zero
+*/
 void *aligned_calloc(int size)
 {
 	const int ALIGN = 64; // cache line
@@ -693,8 +695,8 @@ void *aligned_calloc(int size)
 	memset(res, 0, size);
 	return res;
 #else
-	void *mem = calloc(1, size+ALIGN+sizeof(uintptr_t));
-	void **ptr = (void**)((size_t)(((uintptr_t)(mem))+ALIGN+sizeof(uintptr_t)) & ~(ALIGN-1));
+	void *mem = calloc(1, size + ALIGN + sizeof(uintptr_t));
+	void **ptr = (void**)((size_t)(((uintptr_t)(mem)) + ALIGN + sizeof(uintptr_t)) & ~(ALIGN - 1));
 	ptr[-1] = mem;
 	return ptr;
 #endif
@@ -724,14 +726,14 @@ char *bin2hex(const uchar *in, size_t len)
 	if (!s)
 		return NULL;
 
-	cbin2hex(s, (const char *) in, len);
+	cbin2hex(s, (const char *)in, len);
 
 	return s;
 }
 
 bool hex2bin(void *output, const char *hexstr, size_t len)
 {
-	uchar *p = (uchar *) output;
+	uchar *p = (uchar *)output;
 	char hex_byte[4];
 	char *ep;
 
@@ -744,7 +746,7 @@ bool hex2bin(void *output, const char *hexstr, size_t len)
 		}
 		hex_byte[0] = hexstr[0];
 		hex_byte[1] = hexstr[1];
-		*p = (uchar) strtol(hex_byte, &ep, 16);
+		*p = (uchar)strtol(hex_byte, &ep, 16);
 		if (*ep) {
 			applog(LOG_ERR, "hex2bin failed on '%s'", hex_byte);
 			return false;
@@ -758,8 +760,8 @@ bool hex2bin(void *output, const char *hexstr, size_t len)
 }
 
 /* Subtract the `struct timeval' values X and Y,
-   storing the result in RESULT.
-   Return 1 if the difference is negative, otherwise 0.  */
+storing the result in RESULT.
+Return 1 if the difference is negative, otherwise 0.  */
 int timeval_subtract(struct timeval *result, struct timeval *x,
 	struct timeval *y)
 {
@@ -776,7 +778,7 @@ int timeval_subtract(struct timeval *result, struct timeval *x,
 	}
 
 	/* Compute the time remaining to wait.
-	 * `tv_usec' is certainly positive. */
+	* `tv_usec' is certainly positive. */
 	result->tv_sec = x->tv_sec - y->tv_sec;
 	result->tv_usec = x->tv_usec - y->tv_usec;
 
@@ -788,7 +790,7 @@ bool fulltest(const uint32_t *hash, const uint32_t *target)
 {
 	int i;
 	bool rc = true;
-	
+
 	for (i = 7; i >= 0; i--) {
 		if (hash[i] > target[i]) {
 			rc = false;
@@ -806,7 +808,7 @@ bool fulltest(const uint32_t *hash, const uint32_t *target)
 	if ((!rc && opt_debug) || opt_debug_diff) {
 		uint32_t hash_be[8], target_be[8];
 		char *hash_str, *target_str;
-		
+
 		for (i = 0; i < 8; i++) {
 			be32enc(hash_be + i, hash[7 - i]);
 			be32enc(target_be + i, target[7 - i]);
@@ -816,7 +818,7 @@ bool fulltest(const uint32_t *hash, const uint32_t *target)
 
 		applog(LOG_DEBUG, "DEBUG: %s\nHash:   %s\nTarget: %s",
 			rc ? "hash <= target"
-			   : CL_YLW "hash > target (false positive)" CL_N,
+			: CL_YLW "hash > target (false positive)" CL_N,
 			hash_str,
 			target_str);
 
@@ -856,7 +858,7 @@ void work_set_target(struct work* work, double diff)
 // Only used by longpoll pools
 double target_to_diff(uint32_t* target)
 {
-	uchar* tgt = (uchar*) target;
+	uchar* tgt = (uchar*)target;
 	uint64_t m =
 		(uint64_t)tgt[29] << 56 |
 		(uint64_t)tgt[28] << 48 |
@@ -864,13 +866,13 @@ double target_to_diff(uint32_t* target)
 		(uint64_t)tgt[26] << 32 |
 		(uint64_t)tgt[25] << 24 |
 		(uint64_t)tgt[24] << 16 |
-		(uint64_t)tgt[23] << 8  |
+		(uint64_t)tgt[23] << 8 |
 		(uint64_t)tgt[22] << 0;
 
 	if (!m)
 		return 0.;
 	else
-		return (double)0x0000ffff00000000/m;
+		return (double)0x0000ffff00000000 / m;
 }
 
 #ifdef WIN32
@@ -882,12 +884,12 @@ double target_to_diff(uint32_t* target)
 static bool send_line(curl_socket_t sock, char *s)
 {
 	ssize_t len, sent = 0;
-	
+
 	len = (ssize_t)strlen(s);
 	s[len++] = '\n';
 
 	while (len > 0) {
-		struct timeval timeout = {0, 0};
+		struct timeval timeout = { 0, 0 };
 		ssize_t n;
 		fd_set wd;
 
@@ -989,7 +991,8 @@ char *stratum_recv_line(struct stratum_ctx *sctx)
 					ret = false;
 					break;
 				}
-			} else
+			}
+			else
 				stratum_buffer_append(sctx, s);
 		} while (time(NULL) - rstart < timeout && !strstr(sctx->sockbuf, "\n"));
 
@@ -1056,7 +1059,7 @@ bool stratum_connect(struct stratum_ctx *sctx, const char *url)
 		sctx->url = strdup(url);
 	}
 	free(sctx->curl_url);
-	sctx->curl_url = (char*)malloc(strlen(url)+1);
+	sctx->curl_url = (char*)malloc(strlen(url) + 1);
 	sprintf(sctx->curl_url, "http%s", strstr(url, "://"));
 
 	if (opt_protocol)
@@ -1070,7 +1073,8 @@ bool stratum_connect(struct stratum_ctx *sctx, const char *url)
 	if (opt_proxy && opt_proxy_type != CURLPROXY_HTTP) {
 		curl_easy_setopt(curl, CURLOPT_PROXY, opt_proxy);
 		curl_easy_setopt(curl, CURLOPT_PROXYTYPE, opt_proxy_type);
-	} else if (getenv("http_proxy")) {
+	}
+	else if (getenv("http_proxy")) {
 		if (getenv("all_proxy"))
 			curl_easy_setopt(curl, CURLOPT_PROXY, getenv("all_proxy"));
 		else if (getenv("ALL_PROXY"))
@@ -1148,7 +1152,7 @@ static const char *get_stratum_session_id(json_t *val)
 	arr_val = json_array_get(val, 0);
 	if (!arr_val || !json_is_array(arr_val))
 		return NULL;
-	n = (int) json_array_size(arr_val);
+	n = (int)json_array_size(arr_val);
 	for (i = 0; i < n; i++) {
 		const char *notify;
 		json_t *arr = json_array_get(arr_val, i);
@@ -1173,7 +1177,7 @@ static bool stratum_parse_extranonce(struct stratum_ctx *sctx, json_t *params, i
 		applog(LOG_ERR, "Failed to get extranonce1");
 		goto out;
 	}
-	xn2_size = (int) json_integer_value(json_array_get(params, pndx+1));
+	xn2_size = (int)json_integer_value(json_array_get(params, pndx + 1));
 	if (!xn2_size) {
 		char algo[64] = { 0 };
 		get_currentalgo(algo, sizeof(algo));
@@ -1186,7 +1190,8 @@ static bool stratum_parse_extranonce(struct stratum_ctx *sctx, json_t *params, i
 				goto out;
 			}
 			goto skip_n2;
-		} else {
+		}
+		else {
 			applog(LOG_ERR, "Failed to get extranonce2_size");
 			goto out;
 		}
@@ -1200,7 +1205,7 @@ skip_n2:
 	if (sctx->xnonce1)
 		free(sctx->xnonce1);
 	sctx->xnonce1_size = strlen(xnonce1) / 2;
-	sctx->xnonce1 = (uchar*) calloc(1, sctx->xnonce1_size);
+	sctx->xnonce1 = (uchar*)calloc(1, sctx->xnonce1_size);
 	if (unlikely(!sctx->xnonce1)) {
 		applog(LOG_ERR, "Failed to alloc xnonce1");
 		pthread_mutex_unlock(&stratum_work_lock);
@@ -1265,7 +1270,7 @@ start:
 	err_val = json_object_get(val, "error");
 
 	if (!res_val || json_is_null(res_val) ||
-	    (err_val && !json_is_null(err_val))) {
+		(err_val && !json_is_null(err_val))) {
 		if (opt_debug || retry) {
 			free(s);
 			if (err_val)
@@ -1325,7 +1330,7 @@ bool stratum_authorize(struct stratum_ctx *sctx, const char *user, const char *p
 
 	s = (char*)malloc(80 + strlen(user) + strlen(pass));
 	sprintf(s, "{\"id\": 2, \"method\": \"mining.authorize\", \"params\": [\"%s\", \"%s\"]}",
-	        user, pass);
+		user, pass);
 
 	if (!stratum_send_line(sctx, s))
 		goto out;
@@ -1353,12 +1358,8 @@ bool stratum_authorize(struct stratum_ctx *sctx, const char *user, const char *p
 	err_val = json_object_get(val, "error");
 
 	if (!res_val || json_is_false(res_val) ||
-	    (err_val && !json_is_null(err_val)))  {
-		if (err_val && json_is_array(err_val)) {
-			const char* reason = json_string_value(json_array_get(err_val, 1));
-			applog(LOG_ERR, "Stratum authentication failed (%s)", reason);
-		}
-		else applog(LOG_ERR, "Stratum authentication failed");
+		(err_val && !json_is_null(err_val))) {
+		applog(LOG_ERR, "Stratum authentication failed");
 		goto out;
 	}
 
@@ -1386,12 +1387,14 @@ bool stratum_authorize(struct stratum_ctx *sctx, const char *user, const char *p
 		json_t *extra = JSON_LOADS(sret, &err);
 		if (!extra) {
 			applog(LOG_WARNING, "JSON decode failed(%d): %s", err.line, err.text);
-		} else {
+		}
+		else {
 			if (json_integer_value(json_object_get(extra, "id")) != 3) {
 				// we receive a standard method if extranonce is ignored
 				if (!stratum_handle_method(sctx, sret))
 					applog(LOG_WARNING, "Stratum extranonce answer id was not correct!");
-			} else {
+			}
+			else {
 				res_val = json_object_get(extra, "result");
 				if (opt_debug && (!res_val || json_is_false(res_val)))
 					applog(LOG_DEBUG, "extranonce subscribe not supported");
@@ -1410,30 +1413,30 @@ out:
 }
 
 /**
- * Extract bloc height     L H... here len=3, height=0x1333e8
- * "...0000000000ffffffff2703e83313062f503253482f043d61105408"
- */
+* Extract bloc height     L H... here len=3, height=0x1333e8
+* "...0000000000ffffffff2703e83313062f503253482f043d61105408"
+*/
 static uint32_t getblocheight(struct stratum_ctx *sctx)
 {
 	uint32_t height = 0;
 	uint8_t hlen = 0, *p, *m;
 
 	// find 0xffff tag
-	p = (uint8_t*) sctx->job.coinbase + 32;
+	p = (uint8_t*)sctx->job.coinbase + 32;
 	m = p + 128;
 	while (*p != 0xff && p < m) p++;
 	while (*p == 0xff && p < m) p++;
-	if (*(p-1) == 0xff && *(p-2) == 0xff) {
+	if (*(p - 1) == 0xff && *(p - 2) == 0xff) {
 		p++; hlen = *p;
 		p++; height = le16dec(p);
 		p += 2;
 		switch (hlen) {
-			case 4:
-				height += 0x10000UL * le16dec(p);
-				break;
-			case 3:
-				height += 0x10000UL * (*p);
-				break;
+		case 4:
+			height += 0x10000UL * le16dec(p);
+			break;
+		case 3:
+			height += 0x10000UL * (*p);
+			break;
 		}
 	}
 	return height;
@@ -1445,7 +1448,7 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	const char *claim = NULL, *nreward = NULL;
 	size_t coinb1_size, coinb2_size;
 	bool clean, ret = false;
-	int merkle_count, i, p=0;
+	int merkle_count, i, p = 0;
 	json_t *merkle_arr;
 	uchar **merkle = NULL;
 	// uchar(*merkle_tree)[32] = { 0 };
@@ -1472,7 +1475,7 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	merkle_arr = json_array_get(params, p++);
 	if (!merkle_arr || !json_is_array(merkle_arr))
 		goto out;
-	merkle_count = (int) json_array_size(merkle_arr);
+	merkle_count = (int)json_array_size(merkle_arr);
 	version = json_string_value(json_array_get(params, p++));
 	nbits = json_string_value(json_array_get(params, p++));
 	stime = json_string_value(json_array_get(params, p++));
@@ -1480,23 +1483,23 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	nreward = json_string_value(json_array_get(params, p++));
 
 	if (!job_id || !prevhash || !coinb1 || !coinb2 || !version || !nbits || !stime ||
-	    strlen(prevhash) != 64 || strlen(version) != 8 ||
-	    strlen(nbits) != 8 || strlen(stime) != 8) {
+		strlen(prevhash) != 64 || strlen(version) != 8 ||
+		strlen(nbits) != 8 || strlen(stime) != 8) {
 		applog(LOG_ERR, "Stratum notify: invalid parameters");
 		goto out;
 	}
 
 	/* store stratum server time diff */
 	hex2bin((uchar *)&ntime, stime, 4);
-	ntime = swab32(ntime) - (uint32_t) time(0);
+	ntime = swab32(ntime) - (uint32_t)time(0);
 	if (ntime > sctx->srvtime_diff) {
 		sctx->srvtime_diff = ntime;
-			applog(LOG_DEBUG, "stratum time is at least %d seconds in the future", ntime);
 		if (opt_protocol && ntime > 20)
+			applog(LOG_DEBUG, "stratum time is at least %ds in the future", ntime);
 	}
 
 	if (merkle_count)
-		merkle = (uchar**) malloc(merkle_count * sizeof(char *));
+		merkle = (uchar**)malloc(merkle_count * sizeof(char *));
 	for (i = 0; i < merkle_count; i++) {
 		const char *s = json_string_value(json_array_get(merkle_arr, i));
 		if (!s || strlen(s) != 64) {
@@ -1506,7 +1509,7 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 			applog(LOG_ERR, "Stratum notify: invalid Merkle branch");
 			goto out;
 		}
-		merkle[i] = (uchar*) malloc(32);
+		merkle[i] = (uchar*)malloc(32);
 		hex2bin(merkle[i], s, 32);
 	}
 
@@ -1515,9 +1518,9 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	coinb1_size = strlen(coinb1) / 2;
 	coinb2_size = strlen(coinb2) / 2;
 	sctx->job.coinbase_size = coinb1_size + sctx->xnonce1_size +
-	                          sctx->xnonce2_size + coinb2_size;
+		sctx->xnonce2_size + coinb2_size;
 
-	sctx->job.coinbase = (uchar*) realloc(sctx->job.coinbase, sctx->job.coinbase_size);
+	sctx->job.coinbase = (uchar*)realloc(sctx->job.coinbase, sctx->job.coinbase_size);
 	sctx->job.xnonce2 = sctx->job.coinbase + coinb1_size + sctx->xnonce1_size;
 	hex2bin(sctx->job.coinbase, coinb1, coinb1_size);
 	memcpy(sctx->job.coinbase + coinb1_size, sctx->xnonce1, sctx->xnonce1_size);
@@ -1542,9 +1545,9 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	hex2bin(sctx->job.version, version, 4);
 	hex2bin(sctx->job.nbits, nbits, 4);
 	hex2bin(sctx->job.ntime, stime, 4);
-	if(nreward != NULL)
+	if (nreward != NULL)
 	{
-		if(strlen(nreward) == 4)
+		if (strlen(nreward) == 4)
 			hex2bin(sctx->job.nreward, nreward, 2);
 	}
 	sctx->job.clean = clean;
@@ -1586,10 +1589,10 @@ static bool stratum_reconnect(struct stratum_ctx *sctx, json_t *params)
 	if (json_is_string(port_val))
 		port = atoi(json_string_value(port_val));
 	else
-		port = (int) json_integer_value(port_val);
+		port = (int)json_integer_value(port_val);
 	if (!host || !port)
 		return false;
-	
+
 	free(sctx->url);
 	sctx->url = (char*)malloc(32 + strlen(host));
 	sprintf(sctx->url, "stratum+tcp://%s:%d", host, port);
@@ -1610,7 +1613,7 @@ static bool stratum_pong(struct stratum_ctx *sctx, json_t *id)
 		return ret;
 
 	sprintf(buf, "{\"id\":%d,\"result\":\"pong\",\"error\":null}",
-		(int) json_integer_value(id));
+		(int)json_integer_value(id));
 	ret = stratum_send_line(sctx, buf);
 
 	return ret;
@@ -1697,12 +1700,12 @@ static bool stratum_benchdata(json_t *result, json_t *params, int thr_id)
 	cgpu->khashes = stats_get_speed(thr_id, 0.0) / 1000.0;
 
 	sprintf(vid, "%04hx:%04hx", cgpu->gpu_vid, cgpu->gpu_pid);
-	sprintf(arch, "%d", (int) cgpu->gpu_arch);
+	sprintf(arch, "%d", (int)cgpu->gpu_arch);
 	if (cuda_arch[dev_id] > 0 && cuda_arch[dev_id] != cgpu->gpu_arch) {
 		// if binary was not compiled for the highest cuda arch, add it
-		snprintf(arch, 8, "%d@%d", (int) cgpu->gpu_arch, cuda_arch[dev_id]);
+		snprintf(arch, 8, "%d@%d", (int)cgpu->gpu_arch, cuda_arch[dev_id]);
 	}
-	snprintf(driver, 32, "CUDA %d.%d %s", cuda_ver/1000, (cuda_ver%1000) / 10, driver_version);
+	snprintf(driver, 32, "CUDA %d.%d %s", cuda_ver / 1000, (cuda_ver % 1000) / 10, driver_version);
 	driver[31] = '\0';
 
 	val = json_object();
@@ -1711,8 +1714,8 @@ static bool stratum_benchdata(json_t *result, json_t *params, int thr_id)
 	json_object_set_new(val, "device", json_string(card));
 	json_object_set_new(val, "vendorid", json_string(vid));
 	json_object_set_new(val, "arch", json_string(arch));
-	json_object_set_new(val, "freq", json_integer(cgpu->gpu_clock/1000));
-	json_object_set_new(val, "memf", json_integer(cgpu->gpu_memclock/1000));
+	json_object_set_new(val, "freq", json_integer(cgpu->gpu_clock / 1000));
+	json_object_set_new(val, "memf", json_integer(cgpu->gpu_memclock / 1000));
 	json_object_set_new(val, "curr_freq", json_integer(cgpu->monitor.gpu_clock));
 	json_object_set_new(val, "curr_memf", json_integer(cgpu->monitor.gpu_memclock));
 	json_object_set_new(val, "power", json_integer(watts));
@@ -1745,7 +1748,8 @@ static bool stratum_get_stats(struct stratum_ctx *sctx, json_t *id, json_t *para
 
 	if (!ret) {
 		json_object_set_error(val, 1, "disabled"); //EPERM
-	} else {
+	}
+	else {
 		json_object_set_new(val, "error", json_null());
 	}
 
@@ -1792,7 +1796,7 @@ static bool stratum_show_message(struct stratum_ctx *sctx, json_t *id, json_t *p
 	val = json_array_get(params, 0);
 	if (val)
 		applog(LOG_NOTICE, "MESSAGE FROM SERVER: %s", json_string_value(val));
-	
+
 	if (!id || json_is_null(id))
 		return true;
 
@@ -1876,13 +1880,13 @@ bool stratum_handle_method(struct stratum_ctx *sctx, const char *s)
 		goto out;
 	}
 	if (!strcasecmp(method, "client.get_algo")) { // ccminer only yet!
-		// will prevent wrong algo parameters on a pool, will be used as test on rejects
+												  // will prevent wrong algo parameters on a pool, will be used as test on rejects
 		if (!opt_quiet) applog(LOG_NOTICE, "Pool asked your algo parameter");
 		ret = stratum_get_algo(sctx, id, params);
 		goto out;
 	}
 	if (!strcasecmp(method, "client.get_stats")) { // ccminer/yiimp only yet!
-		// optional to fill device benchmarks
+												   // optional to fill device benchmarks
 		ret = stratum_get_stats(sctx, id, params);
 		goto out;
 	}
@@ -1982,7 +1986,8 @@ bool tq_push(struct thread_q *tq, void *data)
 
 	if (!tq->frozen) {
 		list_add_tail(&ent->q_node, &tq->q);
-	} else {
+	}
+	else {
 		free(ent);
 		rc = false;
 	}
@@ -2026,9 +2031,9 @@ out:
 }
 
 /**
- * @param buf char[9] mini
- * @param time_t timer to convert
- */
+* @param buf char[9] mini
+* @param time_t timer to convert
+*/
 size_t time2str(char* buf, time_t timer)
 {
 	struct tm* tm_info;
@@ -2037,12 +2042,12 @@ size_t time2str(char* buf, time_t timer)
 }
 
 /**
- * Alloc and returns time string (to be freed)
- * @param time_t timer to convert
- */
+* Alloc and returns time string (to be freed)
+* @param time_t timer to convert
+*/
 char* atime2str(time_t timer)
 {
-	char* buf = (char*) malloc(16);
+	char* buf = (char*)malloc(16);
 	memset(buf, 0, 16);
 	time2str(buf, timer);
 	return buf;
@@ -2051,11 +2056,11 @@ char* atime2str(time_t timer)
 /* sprintf can be used in applog */
 static char* format_hash(char* buf, uint8_t* h)
 {
-	uchar *hash = (uchar*) h;
+	uchar *hash = (uchar*)h;
 	int len = 0;
-	for (int i=0; i < 32; i += 4) {
-		len += sprintf(buf+len, "%02x%02x%02x%02x ",
-			hash[i], hash[i+1], hash[i+2], hash[i+3]);
+	for (int i = 0; i < 32; i += 4) {
+		len += sprintf(buf + len, "%02x%02x%02x%02x ",
+			hash[i], hash[i + 1], hash[i + 2], hash[i + 3]);
 	}
 	return buf;
 }
@@ -2067,10 +2072,10 @@ void applog_compare_hash(void *hash, void *hash_ref)
 	int len = 0;
 	uchar* hash1 = (uchar*)hash;
 	uchar* hash2 = (uchar*)hash_ref;
-	for (int i=0; i < 32; i += 4) {
-		const char *color = memcmp(hash1+i, hash2+i, 4) ? CL_WHT : CL_GRY;
-		len += sprintf(s+len, "%s%02x%02x%02x%02x " CL_GRY, color,
-			hash1[i], hash1[i+1], hash1[i+2], hash1[i+3]);
+	for (int i = 0; i < 32; i += 4) {
+		const char *color = memcmp(hash1 + i, hash2 + i, 4) ? CL_WHT : CL_GRY;
+		len += sprintf(s + len, "%s%02x%02x%02x%02x " CL_GRY, color,
+			hash1[i], hash1[i + 1], hash1[i + 2], hash1[i + 3]);
 		s[len] = '\0';
 	}
 	applog(LOG_DEBUG, "%s", s);
@@ -2078,14 +2083,14 @@ void applog_compare_hash(void *hash, void *hash_ref)
 
 void applog_hash(void *hash)
 {
-	char s[128] = {'\0'};
+	char s[128] = { '\0' };
 	applog(LOG_DEBUG, "%s", format_hash(s, (uint8_t*)hash));
 }
 
 void applog_hash64(void *hash)
 {
-	char s[128] = {'\0'};
-	char t[128] = {'\0'};
+	char s[128] = { '\0' };
+	char t[128] = { '\0' };
 	applog(LOG_DEBUG, "%s %s", format_hash(s, (uint8_t*)hash), format_hash(t, &((uint8_t*)hash)[32]));
 }
 
@@ -2152,7 +2157,7 @@ void do_gpu_tests(void)
 void print_hash_tests(void)
 {
 	uchar *scratchbuf = NULL;
-	char s[128] = {'\0'};
+	char s[128] = { '\0' };
 	uchar hash[128];
 	uchar buf[192];
 
@@ -2211,7 +2216,7 @@ void print_hash_tests(void)
 	printpfx("hmq1725", hash);
 
 	hsr_hash(&hash[0], &buf[0]);
-        printpfx("hsr", hash);
+	printpfx("hsr", hash);
 
 	jha_hash(&hash[0], &buf[0]);
 	printpfx("jha", hash);

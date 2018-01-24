@@ -1,5 +1,5 @@
 
-ccminer 2.2.4.1 (Jan. 2018)     "build with NVAPI r384"
+ccminer 2.2.4.2 (Jan. 2018)     "build with last CURL and OpenSSL"
 ---------------------------------------------------------------
 
 ***************************************************************
@@ -269,6 +269,8 @@ so we can more efficiently implement new algorithms using the latest hardware
 features.
 
 >>> RELEASE HISTORY <<<
+  Jan. 24th 2018  V2.2.4.2
+                  build with CURL 7.58.0 and last stable OpenSSL 1.1.0
   Jan. 07th 2018  v2.2.4.1
                   fix warning during compiling CUDA files
 				  Update CUDA SDK to v9.1.85
