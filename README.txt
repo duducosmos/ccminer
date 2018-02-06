@@ -1,5 +1,5 @@
 
-ccminer 2.2.4.2 (Jan. 2018)     "build with last CURL and OpenSSL"
+ccminer 2.2.5 (Feb 2018)                            "x16r algo"
 ---------------------------------------------------------------
 
 ***************************************************************
@@ -52,11 +52,11 @@ where some of these coins have a VERY NOTABLE nVidia advantage
 over competing AMD (OpenCL Only) implementations.
 
 We did not take a big effort on improving usability, so please set
-your parameters carefuly.
+your parameters carefully.
 
 THIS PROGRAMM IS PROVIDED "AS-IS", USE IT AT YOUR OWN RISK!
 
-If you're interessted and read the source-code, please excuse
+If you're interested and read the source-code, please excuse
 that the most of our comments are in german.
 
 >>> Command Line Interface <<<
@@ -114,6 +114,7 @@ its command line interface and options.
                           x11         use to mine DarkCoin
                           x14         use to mine X14Coin
                           x15         use to mine Halcyon
+                          x16r        use to mine Raven
                           x17         use to mine X17
                           vanilla     use to mine Vanilla (Blake256)
                           veltor      use to mine VeltorCoin
@@ -269,6 +270,9 @@ so we can more efficiently implement new algorithms using the latest hardware
 features.
 
 >>> RELEASE HISTORY <<<
+  Feb. 2017       v2.2.5
+                  New x16r algo
+
   Jan. 24th 2018  V2.2.4.2
                   build with CURL 7.58.0 and last stable OpenSSL 1.1.0
   Jan. 07th 2018  v2.2.4.1
