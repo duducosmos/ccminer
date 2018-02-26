@@ -1,4 +1,9 @@
 # ccminer-htmlcoin
+On ubuntu it is necessary to install libcurl4-openssl-dev:
+
+```bash
+sudo apt-get install libcurl4-openssl-dev
+```
 Heavy optimized for Windows, build from Visual Studio 2015, CUDA 9.1.
 
 Based on gelotus fork of ccminer 
