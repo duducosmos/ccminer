@@ -36,7 +36,6 @@ extern "C" int scanhash_sha256d_html(int thr_id, struct work* work, uint32_t max
 	uint32_t *pdata = work->data;
 	uint32_t *ptarget = work->target;
 	const uint32_t first_nonce = pdata[19];
-	const uint32_t nbits = (uint32_t)pdata[18];
 	uint32_t throughput = cuda_default_throughput(thr_id, 1U << 25);
 	if (init[thr_id]) throughput = min(throughput, (max_nonce - first_nonce));
 

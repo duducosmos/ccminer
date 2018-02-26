@@ -15,13 +15,11 @@ __constant__ static uint32_t __align__(8) c_midstate76[8];
 __constant__ static uint32_t __align__(8) c_dataEnd80[4];
 // htmlcoin
 __constant__ static uint32_t __align__(8) c_block_65_128[16];
-__constant__ static uint32_t __align__(8) c_block_129_192[16];
 
 const __constant__  uint32_t __align__(8) c_H256[8] = {
 	0x6A09E667U, 0xBB67AE85U, 0x3C6EF372U, 0xA54FF53AU,
 	0x510E527FU, 0x9B05688CU, 0x1F83D9ABU, 0x5BE0CD19U
 };
-__constant__ static uint32_t __align__(8) c_mid[2];
 __constant__ static uint32_t __align__(8) c_end_64[64];
 __constant__ static uint32_t __align__(8) c_K[64];
 __constant__ static uint32_t __align__(8) c_target[2];
@@ -544,11 +542,6 @@ void sha256d_gpu_hash_shared(const uint32_t threads, const uint32_t startNonce, 
 		dat[15] = 0x280;
 		#pragma unroll
 		for (int i=5; i<15; i++) dat[i] = 0;
-
-		uint32_t buf[8];
-		#pragma unroll
-		for (int i=0; i<8; i+=2) AS_UINT2(&buf[i]) = AS_UINT2(&c_midstate76[i]);
-		//for (int i=0; i<8; i++) buf[i] = c_midstate76[i];
 
 		sha256_round_body(dat, buf, s_K);
 
