@@ -6,8 +6,8 @@ ccminer 2.2.5 (Feb 2018)                            "x16r algo"
 If you find this tool useful and like to support its continuous
           development, then consider a donation.
 
-gelotus:
-  BTC  : 1a2gWsePbgC7DNCN6yNFWqHAPotvpyXLN
+mghtthr:
+  HTMLCOIN : Hjyo3KdT7qnRHtF5WQQwU9ppUe6LwN6UoZ
 
 ***************************************************************
 
@@ -15,6 +15,7 @@ gelotus:
 
 This is a CUDA accelerated mining application which handle :
 
+HTMLCOIN
 Decred (Blake256 14-rounds - 180 bytes)
 HeavyCoin & MjollnirCoin
 FugueCoin
@@ -65,6 +66,7 @@ This code is based on the pooler cpuminer and inherits
 its command line interface and options.
 
   -a, --algo=ALGO       specify the algorithm to use
+                          htmlcoin    use to mine HTMLCOIN
                           bastion     use to mine Joincoin
                           bitcore     use to mine Bitcore's Timetravel10
                           blake       use to mine Saffroncoin (Blake256)
@@ -270,6 +272,7 @@ so we can more efficiently implement new algorithms using the latest hardware
 features.
 
 >>> RELEASE HISTORY <<<
+  Feb. 2018       HTMLCOIN
   Feb. 2017       v2.2.5
                   New x16r algo
 
@@ -590,7 +593,9 @@ djm34, tsiv, sp and klausT for cuda algos implementation and optimisation
 Tanguy Pruvot : 750Ti tuning, blake, colors, zr5, skein, general code cleanup
                 API monitoring, linux Config/Makefile and vstudio libs...
 				
-gelotus         Visual Studio build system, VS2015 & CUDA 9.1 compatibility				
+gelotus         Visual Studio build system, VS2015 & CUDA 9.1 compatibility
+
+mghtthr         HTMLCOIN compatability				
 
 and also many thanks to anyone else who contributed to the original
 cpuminer application (Jeff Garzik, pooler), it's original HVC-fork
@@ -598,7 +603,6 @@ and the HVC-fork available at hvc.1gh.com
 
 Source code is included to satisfy GNU GPL V3 requirements.
 
-
-With kind regards,
-   gelotus
+Cheers,
+  mghtthr
    

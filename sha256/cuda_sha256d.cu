@@ -1,6 +1,7 @@
 /*
  * sha256d CUDA implementation.
  * tpruvot 2017
+ * adjusted for HTMLCOIN by mghtthr@github - 2018
  */
 
 #include <stdio.h>
@@ -12,11 +13,16 @@
 
 __constant__ static uint32_t __align__(8) c_midstate76[8];
 __constant__ static uint32_t __align__(8) c_dataEnd80[4];
+// htmlcoin
+__constant__ static uint32_t __align__(8) c_block_65_128[16];
+__constant__ static uint32_t __align__(8) c_block_129_192[16];
 
 const __constant__  uint32_t __align__(8) c_H256[8] = {
 	0x6A09E667U, 0xBB67AE85U, 0x3C6EF372U, 0xA54FF53AU,
 	0x510E527FU, 0x9B05688CU, 0x1F83D9ABU, 0x5BE0CD19U
 };
+__constant__ static uint32_t __align__(8) c_mid[2];
+__constant__ static uint32_t __align__(8) c_end_64[64];
 __constant__ static uint32_t __align__(8) c_K[64];
 __constant__ static uint32_t __align__(8) c_target[2];
 __device__ uint64_t d_target[1];
@@ -42,6 +48,8 @@ static const uint32_t cpu_K[64] = {
 };
 
 #define ROTR ROTR32
+
+#define uint256_WIDTH 4
 
 __host__
 static void sha256_step1_host(uint32_t a, uint32_t b, uint32_t c, uint32_t &d,
@@ -90,6 +98,8 @@ static void sha256_step2_host(uint32_t a, uint32_t b, uint32_t c, uint32_t &d,
 	d =  d + t1;
 	h = t1 + t2;
 }
+
+#define xor3b(a,b,c) (a ^ b ^ c)
 
 __host__
 static void sha256_round_body_host(uint32_t* in, uint32_t* state, const uint32_t* Kshared)
@@ -150,8 +160,6 @@ static void sha256_round_body_host(uint32_t* in, uint32_t* state, const uint32_t
 	state[7] += h;
 }
 
-#define xor3b(a,b,c) (a ^ b ^ c)
-
 __device__ __forceinline__ uint32_t bsg2_0(const uint32_t x)
 {
 	return xor3b(ROTR32(x,2),ROTR32(x,13),ROTR32(x,22));
@@ -198,10 +206,10 @@ static void sha2_step1(uint32_t a, uint32_t b, uint32_t c, uint32_t &d, uint32_t
 	uint32_t in, const uint32_t Kshared)
 {
 	uint32_t t1,t2;
-	uint32_t vxandx = xandx(e, f, g);
-	uint32_t bsg21 = bsg2_1(e);
-	uint32_t bsg20 = bsg2_0(a);
-	uint32_t andorv = andor32(a,b,c);
+	uint32_t vxandx = xandx(e, f, g); // ch
+	uint32_t bsg21 = bsg2_1(e); // S1, Sigma1
+	uint32_t bsg20 = bsg2_0(a); // S0, Sigma0
+	uint32_t andorv = andor32(a,b,c); // maj
 
 	t1 = h + bsg21 + vxandx + Kshared + in;
 	t2 = bsg20 + andorv;
@@ -224,8 +232,8 @@ static void sha2_step2(uint32_t a, uint32_t b, uint32_t c, uint32_t &d, uint32_t
 	uint32_t inx2 = in[pcidx2];
 	uint32_t inx3 = in[pcidx3];
 
-	uint32_t ssg21 = ssg2_1(inx1);
-	uint32_t ssg20 = ssg2_0(inx3);
+	uint32_t ssg21 = ssg2_1(inx1); // s1, sigma1
+	uint32_t ssg20 = ssg2_0(inx3); // s0, sigma0
 	uint32_t vxandx = xandx(e, f, g);
 	uint32_t bsg21 = bsg2_1(e);
 	uint32_t bsg20 = bsg2_0(a);
@@ -237,6 +245,83 @@ static void sha2_step2(uint32_t a, uint32_t b, uint32_t c, uint32_t &d, uint32_t
 	t2 = bsg20 + andorv;
 	d =  d + t1;
 	h = t1 + t2;
+}
+
+__device__
+static void sha2_step2_end(uint32_t a, uint32_t b, uint32_t c, uint32_t &d, uint32_t e, uint32_t f, uint32_t g, uint32_t &h,
+    const uint32_t Eshared, const uint32_t Kshared)
+{
+	uint32_t t1, t2;
+
+    uint32_t vxandx = xandx(e, f, g);
+    uint32_t bsg21 = bsg2_1(e);
+    uint32_t bsg20 = bsg2_0(a);
+    uint32_t andorv = andor32(a,b,c);
+
+    t1 = h + bsg21 + vxandx + Kshared + Eshared;
+    t2 = bsg20 + andorv;
+    d =  d + t1;
+    h = t1 + t2;
+}
+
+__device__
+static void sha256_round_body_end(uint32_t* const Eshared, uint32_t* state, uint32_t* const Kshared)
+{
+    uint32_t a = state[0];
+    uint32_t b = state[1];
+    uint32_t c = state[2];
+    uint32_t d = state[3];
+    uint32_t e = state[4];
+    uint32_t f = state[5];
+    uint32_t g = state[6];
+    uint32_t h = state[7];
+
+    sha2_step1(a,b,c,d,e,f,g,h,Eshared[ 0],Kshared[ 0]);
+    sha2_step1(h,a,b,c,d,e,f,g,Eshared[ 1],Kshared[ 1]);
+    sha2_step1(g,h,a,b,c,d,e,f,Eshared[ 2],Kshared[ 2]);
+    sha2_step1(f,g,h,a,b,c,d,e,Eshared[ 3],Kshared[ 3]);
+    sha2_step1(e,f,g,h,a,b,c,d,Eshared[ 4],Kshared[ 4]);
+    sha2_step1(d,e,f,g,h,a,b,c,Eshared[ 5],Kshared[ 5]);
+    sha2_step1(c,d,e,f,g,h,a,b,Eshared[ 6],Kshared[ 6]);
+    sha2_step1(b,c,d,e,f,g,h,a,Eshared[ 7],Kshared[ 7]);
+    sha2_step1(a,b,c,d,e,f,g,h,Eshared[ 8],Kshared[ 8]);
+    sha2_step1(h,a,b,c,d,e,f,g,Eshared[ 9],Kshared[ 9]);
+    sha2_step1(g,h,a,b,c,d,e,f,Eshared[10],Kshared[10]);
+    sha2_step1(f,g,h,a,b,c,d,e,Eshared[11],Kshared[11]);
+    sha2_step1(e,f,g,h,a,b,c,d,Eshared[12],Kshared[12]);
+    sha2_step1(d,e,f,g,h,a,b,c,Eshared[13],Kshared[13]);
+    sha2_step1(c,d,e,f,g,h,a,b,Eshared[14],Kshared[14]);
+    sha2_step1(b,c,d,e,f,g,h,a,Eshared[15],Kshared[15]);
+
+    #pragma unroll
+    for (int i=0; i<3; i++)
+    {
+        sha2_step2_end(a,b,c,d,e,f,g,h,Eshared[16+16*i],Kshared[16+16*i]);
+        sha2_step2_end(h,a,b,c,d,e,f,g,Eshared[17+16*i],Kshared[17+16*i]);
+        sha2_step2_end(g,h,a,b,c,d,e,f,Eshared[18+16*i],Kshared[18+16*i]);
+        sha2_step2_end(f,g,h,a,b,c,d,e,Eshared[19+16*i],Kshared[19+16*i]);
+        sha2_step2_end(e,f,g,h,a,b,c,d,Eshared[20+16*i],Kshared[20+16*i]);
+        sha2_step2_end(d,e,f,g,h,a,b,c,Eshared[21+16*i],Kshared[21+16*i]);
+        sha2_step2_end(c,d,e,f,g,h,a,b,Eshared[22+16*i],Kshared[22+16*i]);
+        sha2_step2_end(b,c,d,e,f,g,h,a,Eshared[23+16*i],Kshared[23+16*i]);
+        sha2_step2_end(a,b,c,d,e,f,g,h,Eshared[24+16*i],Kshared[24+16*i]);
+        sha2_step2_end(h,a,b,c,d,e,f,g,Eshared[25+16*i],Kshared[25+16*i]);
+        sha2_step2_end(g,h,a,b,c,d,e,f,Eshared[26+16*i],Kshared[26+16*i]);
+        sha2_step2_end(f,g,h,a,b,c,d,e,Eshared[27+16*i],Kshared[27+16*i]);
+        sha2_step2_end(e,f,g,h,a,b,c,d,Eshared[28+16*i],Kshared[28+16*i]);
+        sha2_step2_end(d,e,f,g,h,a,b,c,Eshared[29+16*i],Kshared[29+16*i]);
+        sha2_step2_end(c,d,e,f,g,h,a,b,Eshared[30+16*i],Kshared[30+16*i]);
+        sha2_step2_end(b,c,d,e,f,g,h,a,Eshared[31+16*i],Kshared[31+16*i]);
+    }
+
+    state[0] += a;
+    state[1] += b;
+    state[2] += c;
+    state[3] += d;
+    state[4] += e;
+    state[5] += f;
+    state[6] += g;
+    state[7] += h;
 }
 
 __device__
@@ -373,6 +458,64 @@ uint64_t cuda_swab32ll(uint64_t x) {
 	return MAKE_ULONGLONG(cuda_swab32(_LODWORD(x)), cuda_swab32(_HIDWORD(x)));
 }
 
+
+__global__
+/*__launch_bounds__(256,3)*/
+void sha256d_gpu_hash_shared_html(const uint32_t threads, const uint32_t startNonce, uint32_t *resNonces)
+{
+	const uint32_t thread = (blockDim.x * blockIdx.x + threadIdx.x);
+
+	__shared__ uint32_t s_K[64*4];
+	__shared__ uint32_t s_end_64[64*4];
+	if (threadIdx.x < 64U) {
+		s_K[threadIdx.x] = c_K[threadIdx.x];
+		s_end_64[threadIdx.x] = c_end_64[threadIdx.x];
+	}
+
+	if (thread < threads)
+	{
+		const uint32_t nonce = startNonce + thread;
+		uint32_t dat[16];
+		uint32_t buf[8];
+
+		#pragma unroll
+		for (int i=0; i<8; i+=2) AS_UINT2(&buf[i]) = AS_UINT2(&c_midstate76[i]);
+
+		// first 64 bytes
+		#pragma unroll
+		for (int i=0; i<16; i+=2) AS_UINT2(&dat[i]) = AS_UINT2(&c_block_65_128[i]);
+		dat[ 3] = nonce;
+
+		sha256_round_body(dat, buf, s_K);
+
+		// second 64 bytes
+		sha256_round_body_end(s_end_64, buf, s_K);
+
+
+
+		// second sha256
+		#pragma unroll
+		for (int i=0; i<8; i++) dat[i] = buf[i];
+		dat[8] = 0x80000000;
+		#pragma unroll
+		for (int i=9; i<15; i++) dat[i] = 0;
+		dat[15] = 0x100;
+
+		#pragma unroll
+		for (int i=0; i<8; i++) buf[i] = c_H256[i];
+
+		sha256_round_last(dat, buf, s_K);
+
+		// valid nonces
+		uint64_t high = cuda_swab32ll(((uint64_t*)buf)[3]);
+		if (high <= c_target[0]) {
+			//printf("%08x %08x - %016llx %016llx - %08x %08x\n", buf[7], buf[6], high, d_target[0], c_target[1], c_target[0]);
+			resNonces[1] = atomicExch(resNonces, nonce);
+			//d_target[0] = high;
+		}
+	}
+}
+
 __global__
 /*__launch_bounds__(256,3)*/
 void sha256d_gpu_hash_shared(const uint32_t threads, const uint32_t startNonce, uint32_t *resNonces)
@@ -388,6 +531,12 @@ void sha256d_gpu_hash_shared(const uint32_t threads, const uint32_t startNonce, 
 		const uint32_t nonce = startNonce + thread;
 
 		uint32_t dat[16];
+		uint32_t buf[8];
+
+		#pragma unroll
+		for (int i=0; i<8; i+=2) AS_UINT2(&buf[i]) = AS_UINT2(&c_midstate76[i]);
+		//for (int i=0; i<8; i++) buf[i] = c_midstate76[i];
+
 		AS_UINT2(dat) = AS_UINT2(c_dataEnd80);
 		dat[ 2] = c_dataEnd80[2];
 		dat[ 3] = nonce;
@@ -443,22 +592,65 @@ void sha256d_free(int thr_id)
 }
 
 __host__
-void sha256d_setBlock_80(uint32_t *pdata, uint32_t *ptarget)
+void sha256d_setBlock_cuda(uint32_t *pdata, uint32_t *ptarget, int data_len)
 {
-	uint32_t _ALIGN(64) in[16], buf[8], end[4];
+	uint32_t _ALIGN(64) in[16], buf[8], end[4], h_end_1[16];
+	uint32_t _ALIGN(64) end_64[64];
+
 	for (int i=0;i<16;i++) in[i] = cuda_swab32(pdata[i]);
 	for (int i=0;i<8;i++) buf[i] = cpu_H256[i];
-	for (int i=0;i<4;i++) end[i] = cuda_swab32(pdata[16+i]);
+	if (data_len == 181) {
+		for (int i=0;i<16;i++) h_end_1[i] = cuda_swab32((pdata[16+i]));
+		for (int i=0;i<13;i++) end_64[i] = cuda_swab32((pdata[32+i]));
+
+		end_64[13] = 0x00800000;
+		end_64[14] = 0x00000000;
+		end_64[15] = 0x000005a8;
+
+		uint32_t ssg21,ssg20;
+		for (int i=16;i<64;i++) {
+			ssg21 = ROTR(end_64[i-2], 17) ^ ROTR(end_64[i-2], 19) ^ SPH_T32((end_64[i-2]) >> 10);
+			ssg20 = ROTR(end_64[i-15], 7) ^ ROTR(end_64[i-15], 18) ^ SPH_T32((end_64[i-15]) >> 3);
+			end_64[i] = ssg21 + end_64[i-7] + ssg20 + end_64[i-16];
+		}
+	}
+	else
+		for (int i=0;i<4;i++) end[i] = cuda_swab32(pdata[16+i]);
 	sha256_round_body_host(in, buf, cpu_K);
 
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(c_midstate76, buf, 32, 0, cudaMemcpyHostToDevice));
-	CUDA_SAFE_CALL(cudaMemcpyToSymbol(c_dataEnd80,  end, sizeof(end), 0, cudaMemcpyHostToDevice));
+	if (data_len == 181) {
+		CUDA_SAFE_CALL(cudaMemcpyToSymbol(c_block_65_128,  h_end_1, 64, 0, cudaMemcpyHostToDevice));
+		CUDA_SAFE_CALL(cudaMemcpyToSymbol(c_end_64, end_64, 256, 0, cudaMemcpyHostToDevice));
+	}
+	else {
+		CUDA_SAFE_CALL(cudaMemcpyToSymbol(c_dataEnd80, end, sizeof(end), 0, cudaMemcpyHostToDevice));
+	}
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(c_target, &ptarget[6], 8, 0, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpyToSymbol(d_target, &ptarget[6], 8, 0, cudaMemcpyHostToDevice));
 }
 
 __host__
-void sha256d_hash_80(int thr_id, uint32_t threads, uint32_t startNonce, uint32_t *resNonces)
+void sha256d_hash_cuda_html(int thr_id, uint32_t threads, uint32_t startNonce, uint32_t *resNonces)
+{
+	const uint32_t threadsperblock = 256;
+
+	dim3 grid(threads/threadsperblock);
+	dim3 block(threadsperblock);
+
+	CUDA_SAFE_CALL(cudaMemset(d_resNonces[thr_id], 0xFF, 2 * sizeof(uint32_t)));
+	cudaThreadSynchronize();
+	sha256d_gpu_hash_shared_html <<<grid, block>>> (threads, startNonce, d_resNonces[thr_id]);
+	cudaThreadSynchronize();
+	CUDA_SAFE_CALL(cudaMemcpy(resNonces, d_resNonces[thr_id], 2 * sizeof(uint32_t), cudaMemcpyDeviceToHost));
+
+	if (resNonces[0] == resNonces[1]) {
+		resNonces[1] = UINT32_MAX;
+	}
+}
+
+__host__
+void sha256d_hash_cuda(int thr_id, uint32_t threads, uint32_t startNonce, uint32_t *resNonces)
 {
 	const uint32_t threadsperblock = 256;
 

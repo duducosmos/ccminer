@@ -305,6 +305,7 @@ extern int scanhash_phi(int thr_id, struct work* work, uint32_t max_nonce, unsig
 extern int scanhash_polytimos(int thr_id, struct work* work, uint32_t max_nonce, unsigned long *hashes_done);
 extern int scanhash_quark(int thr_id, struct work *work, uint32_t max_nonce, unsigned long *hashes_done);
 extern int scanhash_qubit(int thr_id, struct work* work, uint32_t max_nonce, unsigned long *hashes_done);
+extern int scanhash_sha256d_html(int thr_id, struct work *work, uint32_t max_nonce, unsigned long *hashes_done);
 extern int scanhash_sha256d(int thr_id, struct work *work, uint32_t max_nonce, unsigned long *hashes_done);
 extern int scanhash_sha256t(int thr_id, struct work *work, uint32_t max_nonce, unsigned long *hashes_done);
 extern int scanhash_sia(int thr_id, struct work *work, uint32_t max_nonce, unsigned long *hashes_done);
@@ -708,10 +709,11 @@ struct tx {
 #define MAX_NONCES 2
 struct work {
 	uint32_t data[48];
+    int data_len;
 	uint32_t target[8];
 	uint32_t maxvote;
 
-	char job_id[128];
+	char job_id[192];
 	size_t xnonce2_len;
 	uchar xnonce2[32];
 
@@ -917,7 +919,7 @@ void quarkhash(void *state, const void *input);
 void qubithash(void *state, const void *input);
 void scrypthash(void* output, const void* input);
 void scryptjane_hash(void* output, const void* input);
-void sha256d_hash(void *output, const void *input);
+void sha256d_hash(void *output, const void *input, int data_len);
 void sha256t_hash(void *output, const void *input);
 void sibhash(void *output, const void *input);
 void skeincoinhash(void *output, const void *input);

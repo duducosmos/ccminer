@@ -272,6 +272,7 @@ Options:\n\
 			polytimos   Politimos\n\
 			quark       Quark\n\
 			qubit       Qubit\n\
+			htmlcoin    SHA256d (htmlcoin)\n\
 			sha256d     SHA256d (bitcoin)\n\
 			sha256t     SHA256 x3\n\
 			sia         SIA (Blake2B)\n\
@@ -703,6 +704,13 @@ static bool work_decode(const json_t *val, struct work *work)
 	case ALGO_CRYPTONIGHT:
 	case ALGO_WILDKECCAK:
 		return rpc2_job_decode(val, work);
+	case ALGO_HTML:
+		data_size = 192;
+		adata_sz = data_size / 4;
+        work->data_len = 181;
+        break;
+    case ALGO_SHA256D:
+        work->data_len = 80;
 	default:
 		data_size = 128;
 		adata_sz = data_size / 4;
@@ -949,6 +957,7 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 		case ALGO_BLAKECOIN:
 		case ALGO_BLAKE2S:
 		case ALGO_BMW:
+		case ALGO_HTML:
 		case ALGO_SHA256D:
 		case ALGO_SHA256T:
 		case ALGO_VANILLA:
@@ -1065,6 +1074,9 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 		else if (opt_algo == ALGO_SIA) {
 			return sia_submit(curl, pool, work);
 		}
+		else if (opt_algo == ALGO_HTML) {
+			data_size = 192; adata_sz = data_size / 4;
+		}
 
 		if (opt_algo != ALGO_HEAVY && opt_algo != ALGO_MJOLLNIR) {
 			for (int i = 0; i < adata_sz; i++)
@@ -1150,14 +1162,23 @@ static const char *gbt_req =
 	//	"\"capabilities\": " GBT_CAPABILITIES ""
 	"}], \"id\":9}\r\n";
 
+static const char *gbt_html_req =
+"{\"method\": \"getblocktemplate\", \"params\": [{"
+    "\"rules\": [\"segwit\"]"
+"}], \"id\":9}\r\n";
+
 static bool get_blocktemplate(CURL *curl, struct work *work)
 {
 	struct pool_infos *pool = &pools[work->pooln];
+	json_t *val;
 	if (!allow_gbt)
 		return false;
 
 	int curl_err = 0;
-	json_t *val = json_rpc_call_pool(curl, pool, gbt_req, false, false, &curl_err);
+	if (opt_algo == ALGO_HTML)
+		val = json_rpc_call_pool(curl, pool, gbt_html_req, false, false, &curl_err);
+	else
+		val = json_rpc_call_pool(curl, pool, gbt_req, false, false, &curl_err);
 
 	if (!val && curl_err == -1) {
 		// when getblocktemplate is not supported, disable it
@@ -2216,6 +2237,7 @@ static void *miner_thread(void *userdata)
 			case ALGO_BLAKE:
 			case ALGO_BMW:
 			case ALGO_DECRED:
+			case ALGO_HTML:
 			case ALGO_SHA256D:
 			case ALGO_SHA256T:
 			//case ALGO_WHIRLPOOLX:
@@ -2446,6 +2468,9 @@ static void *miner_thread(void *userdata)
 		case ALGO_SKUNK:
 			rc = scanhash_skunk(thr_id, &work, max_nonce, &hashes_done);
 			break;
+		case ALGO_HTML:
+            rc = scanhash_sha256d_html(thr_id, &work, max_nonce, &hashes_done);
+            break;
 		case ALGO_SHA256D:
 			rc = scanhash_sha256d(thr_id, &work, max_nonce, &hashes_done);
 			break;
@@ -3866,7 +3891,7 @@ int main(int argc, char *argv[])
 	// get opt_quiet early
 	parse_single_opt('q', argc, argv);
 
-	printf("*** ccminer-VC2015 " PACKAGE_VERSION " for nVidia GPUs by gelotus ***\n");
+	printf("*** ccminer-htmlcoin " PACKAGE_VERSION " for nVidia GPUs by mghtthr ***\n");
 	if (!opt_quiet) {
 		const char* arch = is_x64() ? "64-bits" : "32-bits";
 #ifdef _MSC_VER
@@ -3875,9 +3900,9 @@ int main(int argc, char *argv[])
 		printf("    Built with the nVidia CUDA Toolkit %d.%d %s\n\n",
 #endif
 			CUDART_VERSION/1000, (CUDART_VERSION % 1000)/10, arch);
-		printf("  Originally based on tpruvot fork of Christian Buchner and Christian H. project\n");
+		printf("  Originally based on tpruvot fork of Christian Buchner and Christian H. project and gelotus repo.\n");
 		printf("  Include some kernels from alexis78, djm34, djEzo, tsiv and krnlx.\n\n");
-		printf("BTC donation address: 1a2gWsePbgC7DNCN6yNFWqHAPotvpyXLN (gelotus)\n\n");
+		printf("HTMLCOIN donation address: Hjyo3KdT7qnRHtF5WQQwU9ppUe6LwN6UoZ (mghtthr)\n\n");
 	}
 
 	rpc_user = strdup("");
